@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Store } from '@/types'
-import { CreditCard, Smartphone, FileText, Star, MessageSquare } from 'lucide-react'
+import { CreditCard, Smartphone, FileText, Star, MessageSquare, AlertTriangle } from 'lucide-react'
 
 interface StoreCardProps {
   store: Store
@@ -16,7 +16,21 @@ export default function StoreCard({ store, averageRating, reviewCount }: StoreCa
       <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h2 className="font-semibold text-gray-900">{store.name}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-gray-900">{store.name}</h2>
+              {store.closure_reports >= 3 && (
+                <span className="flex items-center gap-1 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">
+                  <AlertTriangle size={10} />
+                  폐업의심
+                </span>
+              )}
+              {store.closure_reports > 0 && store.closure_reports < 3 && (
+                <span className="flex items-center gap-1 text-xs bg-yellow-100 text-yellow-600 px-1.5 py-0.5 rounded">
+                  <AlertTriangle size={10} />
+                  신고{store.closure_reports}
+                </span>
+              )}
+            </div>
             <p className="text-sm text-gray-600 mt-1">
               {store.road_address || store.address}
             </p>

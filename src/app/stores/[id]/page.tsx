@@ -20,20 +20,17 @@ import {
   MapPin,
   Store as StoreIcon,
   Tag,
-  CheckCircle,
   XCircle,
-  AlertCircle,
   TrendingUp,
   Heart,
 } from 'lucide-react'
 import { addFavorite, removeFavorite, isFavorite } from '@/lib/favorites'
 
-type ReportStatus = 'open' | 'closed' | 'no_voucher'
-
 interface Report {
   id: number
   store_id: number
-  status: ReportStatus
+  user_id: string | null
+  status: string
   created_at: string
 }
 
@@ -49,6 +46,7 @@ export default function StoreDetailPage() {
   const [submitting, setSubmitting] = useState(false)
   const [favorited, setFavorited] = useState(false)
   const [favLoading, setFavLoading] = useState(false)
+  const [alreadyReported, setAlreadyReported] = useState(false)
 
   const averageRating =
     reviews.length > 0
@@ -65,12 +63,22 @@ export default function StoreDetailPage() {
   useEffect(() => {
     const { data: { subscription } } = onAuthStateChange(async (user) => {
       setUser(user)
-      // 즐겨찾기 상태 확인
       if (user) {
+        // 즐겨찾기 상태 확인
         const { isFavorite: fav } = await isFavorite(user.id, parseInt(storeId))
         setFavorited(fav)
+        // 이미 폐업 신고했는지 확인
+        const { data: existingReport } = await supabase
+          .from('reports')
+          .select('id')
+          .eq('store_id', storeId)
+          .eq('user_id', user.id)
+          .eq('status', 'closed')
+          .maybeSingle()
+        setAlreadyReported(!!existingReport)
       } else {
         setFavorited(false)
+        setAlreadyReported(false)
       }
     })
     return () => subscription.unsubscribe()
@@ -116,30 +124,30 @@ export default function StoreDetailPage() {
     fetchData()
   }, [storeId])
 
-  const handleReport = async (status: ReportStatus) => {
+  const handleReport = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+    if (alreadyReported) {
+      alert('이미 신고하셨습니다.')
+      return
+    }
+
     setSubmitting(true)
     const { data, error } = await supabase
       .from('reports')
-      .insert({ store_id: parseInt(storeId), status })
+      .insert({ store_id: parseInt(storeId), status: 'closed', user_id: user.id })
       .select()
       .single()
 
     if (!error && data) {
       setReports([data, ...reports])
+      setAlreadyReported(true)
     }
     setSubmitting(false)
   }
 
-  const getStatusLabel = (status: ReportStatus) => {
-    switch (status) {
-      case 'open':
-        return { label: '영업중', color: 'text-green-600', icon: CheckCircle }
-      case 'closed':
-        return { label: '폐업', color: 'text-red-600', icon: XCircle }
-      case 'no_voucher':
-        return { label: '상품권 안받음', color: 'text-yellow-600', icon: AlertCircle }
-    }
-  }
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -293,61 +301,62 @@ export default function StoreDetailPage() {
           </div>
         )}
 
-        {/* 유저 제보 */}
-        <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-100 mb-4">
-          <h3 className="font-semibold text-gray-900 mb-3">현재 상태 제보하기</h3>
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleReport('open')}
-              disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-green-200 text-green-700 hover:bg-green-50 transition-colors disabled:opacity-50"
-            >
-              <CheckCircle size={16} />
-              영업중
-            </button>
-            <button
-              onClick={() => handleReport('closed')}
-              disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 text-red-700 hover:bg-red-50 transition-colors disabled:opacity-50"
-            >
-              <XCircle size={16} />
-              폐업
-            </button>
-            <button
-              onClick={() => handleReport('no_voucher')}
-              disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-yellow-200 text-yellow-700 hover:bg-yellow-50 transition-colors disabled:opacity-50"
-            >
-              <AlertCircle size={16} />
-              안받음
-            </button>
-          </div>
-
-          {/* 최근 제보 */}
-          {reports.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <p className="text-xs text-gray-500 mb-2">최근 제보</p>
-              <div className="space-y-2">
-                {reports.map((report) => {
-                  const status = getStatusLabel(report.status)
-                  const Icon = status.icon
-                  return (
-                    <div
-                      key={report.id}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <div className={`flex items-center gap-1.5 ${status.color}`}>
-                        <Icon size={14} />
-                        {status.label}
-                      </div>
-                      <span className="text-gray-400 text-xs">
-                        {formatDate(report.created_at)}
-                      </span>
-                    </div>
-                  )
-                })}
+        {/* 폐업 신고 현황 */}
+        {(() => {
+          const closedReports = reports.filter(r => r.status === 'closed').length
+          if (closedReports >= 3) {
+            return (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 text-red-700">
+                  <XCircle size={18} />
+                  <span className="font-semibold">폐업 의심</span>
+                  <span className="text-sm text-red-600">({closedReports}명 신고)</span>
+                </div>
+                <p className="text-sm text-red-600 mt-1">
+                  여러 사용자가 폐업을 신고했습니다. 방문 전 확인하세요.
+                </p>
               </div>
-            </div>
+            )
+          } else if (closedReports > 0) {
+            return (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 text-yellow-700">
+                  <XCircle size={18} />
+                  <span className="font-semibold">폐업 신고 {closedReports}건</span>
+                </div>
+                <p className="text-sm text-yellow-600 mt-1">
+                  일부 사용자가 폐업을 신고했습니다.
+                </p>
+              </div>
+            )
+          }
+          return null
+        })()}
+
+        {/* 폐업 신고 버튼 */}
+        <div className="flex justify-end mb-4">
+          {!user ? (
+            <Link
+              href={`/login?redirect=/stores/${storeId}`}
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
+            >
+              <XCircle size={14} />
+              폐업 신고 (로그인 필요)
+            </Link>
+          ) : alreadyReported ? (
+            <span className="text-sm text-gray-300 flex items-center gap-1">
+              <XCircle size={14} />
+              신고 완료
+            </span>
+          ) : (
+            <button
+              onClick={handleReport}
+              disabled={submitting}
+              className="text-sm text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1 disabled:opacity-50"
+            >
+              <XCircle size={14} />
+              폐업 신고
+            </button>
           )}
         </div>
 

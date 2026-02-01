@@ -11,6 +11,7 @@ export interface Store {
   card_available: boolean
   mobile_available: boolean
   paper_available: boolean
+  closure_reports: number
 }
 
 export interface Review {
