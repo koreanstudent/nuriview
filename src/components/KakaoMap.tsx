@@ -18,6 +18,7 @@ interface KakaoMapProps {
   singleMarker?: boolean
   className?: string
   myLocation?: { lat: number; lng: number } | null
+  onMapReady?: () => void
 }
 
 export default function KakaoMap({
@@ -29,6 +30,7 @@ export default function KakaoMap({
   singleMarker = false,
   className = '',
   myLocation = null,
+  onMapReady,
 }: KakaoMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const [map, setMap] = useState<kakao.maps.Map | null>(null)
@@ -56,6 +58,7 @@ export default function KakaoMap({
       })
 
       setMap(mapInstance)
+      onMapReady?.()
 
       // 클러스터러 생성 (단일 마커 모드가 아닐 때만)
       if (!singleMarker) {

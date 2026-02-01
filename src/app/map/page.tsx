@@ -36,29 +36,31 @@ export default function MapPage() {
   const [locating, setLocating] = useState(false)
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [showNearbyList, setShowNearbyList] = useState(false)
+  const [mapReady, setMapReady] = useState(false)
 
-  // 페이지 로드 시 자동으로 내 위치 가져오기
+  // 지도 준비 완료 후 내 위치 가져오기
   useEffect(() => {
-    if (navigator.geolocation) {
-      setLocating(true)
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const loc = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          }
-          setCenter(loc)
-          setMyLocation(loc)
-          setLocating(false)
-        },
-        () => {
-          // 위치 권한 거부 시 기본 위치(서울) 유지
-          setLocating(false)
-        },
-        { enableHighAccuracy: true }
-      )
-    }
-  }, [])
+    if (!mapReady) return
+    if (!navigator.geolocation) return
+
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const loc = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        }
+        setCenter(loc)
+        setMyLocation(loc)
+        setLocating(false)
+      },
+      () => {
+        // 위치 권한 거부 시 기본 위치(서울) 유지
+        setLocating(false)
+      },
+      { enableHighAccuracy: true }
+    )
+  }, [mapReady])
 
   const fetchStoresInBounds = useCallback(async (bounds: Bounds) => {
     setLoading(true)
@@ -128,6 +130,7 @@ export default function MapPage() {
         level={5}
         onBoundsChange={fetchStoresInBounds}
         myLocation={myLocation}
+        onMapReady={() => setMapReady(true)}
       />
 
       {/* 로딩 표시 */}
