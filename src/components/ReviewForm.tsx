@@ -203,7 +203,7 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
         )}
       </div>
 
-      {/* 상품권 종류 */}
+      {/* 사용한 상품권 */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">사용한 상품권</label>
         <div className="flex gap-2">
