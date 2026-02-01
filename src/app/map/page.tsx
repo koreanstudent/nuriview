@@ -124,14 +124,16 @@ export default function MapPage() {
   return (
     <main className="relative h-[calc(100vh-56px)]">
       {/* 지도 */}
-      <KakaoMap
-        stores={stores}
-        center={center}
-        level={5}
-        onBoundsChange={fetchStoresInBounds}
-        myLocation={myLocation}
-        onMapReady={() => setMapReady(true)}
-      />
+      <div className="absolute inset-0 z-0">
+        <KakaoMap
+          stores={stores}
+          center={center}
+          level={5}
+          onBoundsChange={fetchStoresInBounds}
+          myLocation={myLocation}
+          onMapReady={() => setMapReady(true)}
+        />
+      </div>
 
       {/* 로딩 표시 */}
       {loading && (
@@ -151,7 +153,7 @@ export default function MapPage() {
       <button
         onClick={handleMyLocation}
         disabled={locating}
-        className={`absolute ${showList ? 'bottom-72' : 'bottom-20'} right-4 bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-all disabled:opacity-50`}
+        className={`absolute ${showList ? 'bottom-72' : 'bottom-20'} right-4 z-20 bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-all disabled:opacity-50`}
         title="내 위치로 이동"
       >
         {locating ? (
@@ -162,7 +164,7 @@ export default function MapPage() {
       </button>
 
       {/* 가맹점 목록 */}
-      <div className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-transform ${showList ? 'translate-y-0' : 'translate-y-[calc(100%-48px)]'}`}>
+      <div className={`absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-2xl shadow-lg transition-transform ${showList ? 'translate-y-0' : 'translate-y-[calc(100%-48px)]'}`}>
         {/* 헤더 */}
         <button
           onClick={() => setShowList(!showList)}
