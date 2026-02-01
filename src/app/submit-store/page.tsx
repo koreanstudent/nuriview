@@ -67,10 +67,7 @@ export default function SubmitStorePage() {
   }, [router])
 
   const handleAddressSearch = () => {
-    if (!scriptsLoaded.postcode || !scriptsLoaded.kakao) {
-      setError('주소 검색을 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
-      return
-    }
+    if (!scriptsLoaded.postcode || !scriptsLoaded.kakao) return
 
     new window.daum.Postcode({
       oncomplete: (data) => {
@@ -239,17 +236,22 @@ export default function SubmitStorePage() {
                       type="text"
                       value={address}
                       readOnly
-                      placeholder="주소 검색을 클릭하세요"
+                      placeholder={scriptsLoaded.postcode && scriptsLoaded.kakao ? "주소 검색을 클릭하세요" : "로딩 중..."}
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-gray-900 bg-gray-50 cursor-pointer focus:outline-none"
-                      onClick={handleAddressSearch}
+                      onClick={() => scriptsLoaded.postcode && scriptsLoaded.kakao && handleAddressSearch()}
                     />
                   </div>
                   <button
                     type="button"
                     onClick={handleAddressSearch}
-                    className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    disabled={!scriptsLoaded.postcode || !scriptsLoaded.kakao}
+                    className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Search size={18} />
+                    {(!scriptsLoaded.postcode || !scriptsLoaded.kakao) ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Search size={18} />
+                    )}
                     검색
                   </button>
                 </div>
