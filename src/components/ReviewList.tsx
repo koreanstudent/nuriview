@@ -118,7 +118,7 @@ export default function ReviewList({ reviews, user, onReviewDeleted }: ReviewLis
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
-                {/* 별점 & 시간 */}
+                {/* 별점 & 시간 & 좋아요 */}
                 <div className="flex items-center gap-2 mb-1">
                   <div className="flex text-yellow-400">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -132,6 +132,20 @@ export default function ReviewList({ reviews, user, onReviewDeleted }: ReviewLis
                   <span className="text-xs text-gray-400">
                     {formatTimeAgo(review.created_at)}
                   </span>
+                  <span className="text-gray-300">·</span>
+                  <button
+                    onClick={() => handleLike(review.id)}
+                    disabled={!user || likingId === review.id}
+                    className={`flex items-center gap-1 text-xs transition-colors ${
+                      isLiked
+                        ? 'text-blue-600'
+                        : 'text-gray-400 hover:text-blue-600'
+                    } disabled:opacity-50`}
+                    title={user ? (isLiked ? '좋아요 취소' : '좋아요') : '로그인 필요'}
+                  >
+                    <ThumbsUp size={12} fill={isLiked ? 'currentColor' : 'none'} />
+                    <span>{likeCount > 0 ? likeCount : '좋아요'}</span>
+                  </button>
                 </div>
 
                 {/* 작성자 */}
@@ -154,41 +168,24 @@ export default function ReviewList({ reviews, user, onReviewDeleted }: ReviewLis
                   </div>
                 )}
 
-                {/* 뱃지 & 좋아요 */}
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex flex-wrap gap-2">
-                    {review.is_available ? (
-                      <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                        <CheckCircle size={12} />
-                        사용 가능
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
-                        <XCircle size={12} />
-                        사용 불가
-                      </span>
-                    )}
-                    {review.min_amount > 0 && (
-                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                        최소 {review.min_amount.toLocaleString()}원
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 좋아요 버튼 */}
-                  <button
-                    onClick={() => handleLike(review.id)}
-                    disabled={!user || likingId === review.id}
-                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
-                      isLiked
-                        ? 'text-blue-600 bg-blue-50'
-                        : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'
-                    } disabled:opacity-50`}
-                    title={user ? (isLiked ? '좋아요 취소' : '좋아요') : '로그인 필요'}
-                  >
-                    <ThumbsUp size={14} fill={isLiked ? 'currentColor' : 'none'} />
-                    {likeCount > 0 && <span>{likeCount}</span>}
-                  </button>
+                {/* 뱃지 */}
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {review.is_available ? (
+                    <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                      <CheckCircle size={12} />
+                      사용 가능
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                      <XCircle size={12} />
+                      사용 불가
+                    </span>
+                  )}
+                  {review.min_amount > 0 && (
+                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                      최소 {review.min_amount.toLocaleString()}원
+                    </span>
+                  )}
                 </div>
               </div>
 

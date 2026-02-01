@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "deploy": "./deploy.sh",
     "fetch-stores": "npx tsx src/scripts/fetch-stores.ts",
     "geocode": "npx tsx src/scripts/geocode-stores.ts",
     "match-coords": "npx tsx src/scripts/match-store-coords.ts",

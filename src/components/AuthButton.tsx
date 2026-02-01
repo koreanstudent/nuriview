@@ -61,10 +61,10 @@ export default function AuthButton() {
   return (
     <Link
       href="/login"
-      className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+      className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
     >
       <LogIn size={16} />
-      로그인
+      <span className="hidden sm:inline">로그인</span>
     </Link>
   )
 }
