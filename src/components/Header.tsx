@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import AuthButton from './AuthButton'
-import { Search, Map } from 'lucide-react'
+import { Search, Map, Users } from 'lucide-react'
 
 export default function Header() {
   const pathname = usePathname()
@@ -40,6 +40,17 @@ export default function Header() {
               >
                 <Map size={16} />
                 <span className="hidden sm:inline">지도</span>
+              </Link>
+              <Link
+                href="/submissions"
+                className={`flex items-center gap-1 px-2 sm:px-3 py-2 text-sm rounded-lg transition-colors ${
+                  isActive('/submissions')
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <Users size={16} />
+                <span className="hidden sm:inline">제보</span>
               </Link>
             </nav>
           </div>

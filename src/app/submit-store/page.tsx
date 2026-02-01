@@ -87,7 +87,7 @@ export default function SubmitStorePage() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">제보 완료</h2>
             <p className="text-gray-600 mb-6">
               가맹점 정보가 등록되었습니다.<br />
-              검토 후 반영됩니다.
+              <strong>5명</strong> 이상 확인되면 자동으로 가맹점에 추가됩니다.
             </p>
             <div className="flex gap-3 justify-center">
               <button
@@ -103,10 +103,10 @@ export default function SubmitStorePage() {
                 추가 제보하기
               </button>
               <Link
-                href="/stores"
+                href="/submissions"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                가맹점 목록
+                확인 투표하기
               </Link>
             </div>
           </div>

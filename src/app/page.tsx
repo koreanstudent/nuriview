@@ -198,12 +198,20 @@ export default function Home() {
             <li>- 최소 결제금액</li>
             <li>- 친절도, 분위기 등</li>
           </ul>
-          <Link
-            href="/submit-store"
-            className="inline-block text-sm text-blue-600 hover:text-blue-700 font-medium"
-          >
-            찾는 가맹점이 없나요? 새 가맹점 제보하기 →
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/submit-store"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              새 가맹점 제보하기 →
+            </Link>
+            <Link
+              href="/submissions"
+              className="text-sm text-green-600 hover:text-green-700 font-medium"
+            >
+              제보 확인하기 →
+            </Link>
+          </div>
         </section>
       </div>
     </main>

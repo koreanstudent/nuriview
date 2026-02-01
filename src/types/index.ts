@@ -25,3 +25,22 @@ export interface Review {
   image_url: string | null
   created_at: string
 }
+
+export interface StoreSubmission {
+  id: number
+  user_id: string
+  name: string
+  address: string
+  category: string | null
+  note: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  confirm_count: number
+  created_at: string
+}
+
+export interface StoreConfirmation {
+  id: number
+  submission_id: number
+  user_id: string
+  created_at: string
+}
