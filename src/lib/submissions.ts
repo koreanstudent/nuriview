@@ -91,15 +91,15 @@ async function autoApproveSubmission(submissionId: number) {
 
   if (!submission) return
 
-  // stores 테이블에 추가
+  // stores 테이블에 추가 (제보의 좌표 사용)
   await supabase
     .from('stores')
     .insert({
       name: submission.name,
       address: submission.address,
       category: submission.category,
-      lat: 0,
-      lng: 0,
+      lat: submission.lat || 0,
+      lng: submission.lng || 0,
     })
 
   // 상태 업데이트
