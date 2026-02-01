@@ -183,7 +183,7 @@ export default function SubmitStorePage() {
         onLoad={() => setScriptsLoaded(prev => ({ ...prev, postcode: true }))}
       />
       <Script
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_APP_KEY}&libraries=services&autoload=false`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
         onLoad={() => setScriptsLoaded(prev => ({ ...prev, kakao: true }))}
       />
       <main className="min-h-screen bg-gray-50 px-4 py-6">
