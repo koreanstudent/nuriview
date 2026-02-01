@@ -53,8 +53,9 @@ export default function SubmissionsPage() {
     init()
   }, [])
 
-  const handleConfirm = async (submissionId: number) => {
+  const handleConfirm = async (submissionId: number, submitterUserId: string) => {
     if (!user) return
+    if (user.id === submitterUserId) return // 자기 제보는 확인 불가
 
     setConfirmingId(submissionId)
     const isConfirmed = userConfirmed.has(submissionId)
@@ -177,14 +178,16 @@ export default function SubmissionsPage() {
                     </div>
 
                     <button
-                      onClick={() => handleConfirm(submission.id)}
-                      disabled={!user || confirmingId === submission.id}
+                      onClick={() => handleConfirm(submission.id, submission.user_id)}
+                      disabled={!user || confirmingId === submission.id || user?.id === submission.user_id}
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                         isConfirmed
                           ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                          : user?.id === submission.user_id
+                          ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
-                      title={user ? (isConfirmed ? '확인 취소' : '확인하기') : '로그인 필요'}
+                      title={!user ? '로그인 필요' : user.id === submission.user_id ? '본인 제보' : isConfirmed ? '확인 취소' : '확인하기'}
                     >
                       {confirmingId === submission.id ? (
                         <Loader2 size={16} className="animate-spin" />
