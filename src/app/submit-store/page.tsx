@@ -44,7 +44,7 @@ export default function SubmitStorePage() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [scriptsLoaded, setScriptsLoaded] = useState({ postcode: false, kakao: false })
+  const [scriptsLoaded, setScriptsLoaded] = useState(false)
 
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
@@ -66,8 +66,20 @@ export default function SubmitStorePage() {
     init()
   }, [router])
 
+  // 스크립트 로드 확인
+  useEffect(() => {
+    const checkScripts = () => {
+      if (typeof window !== 'undefined' && window.daum?.Postcode && window.kakao?.maps) {
+        setScriptsLoaded(true)
+      } else {
+        setTimeout(checkScripts, 100)
+      }
+    }
+    checkScripts()
+  }, [])
+
   const handleAddressSearch = () => {
-    if (!scriptsLoaded.postcode || !scriptsLoaded.kakao) return
+    if (!scriptsLoaded) return
 
     new window.daum.Postcode({
       oncomplete: (data) => {
@@ -177,11 +189,11 @@ export default function SubmitStorePage() {
     <>
       <Script
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
-        onLoad={() => setScriptsLoaded(prev => ({ ...prev, postcode: true }))}
+        strategy="beforeInteractive"
       />
       <Script
         src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&libraries=services&autoload=false`}
-        onLoad={() => setScriptsLoaded(prev => ({ ...prev, kakao: true }))}
+        strategy="beforeInteractive"
       />
       <main className="min-h-screen bg-gray-50 px-4 py-6">
         <div className="max-w-lg mx-auto">
@@ -236,18 +248,18 @@ export default function SubmitStorePage() {
                       type="text"
                       value={address}
                       readOnly
-                      placeholder={scriptsLoaded.postcode && scriptsLoaded.kakao ? "주소 검색을 클릭하세요" : "로딩 중..."}
+                      placeholder={scriptsLoaded ? "주소 검색을 클릭하세요" : "로딩 중..."}
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-gray-900 bg-gray-50 cursor-pointer focus:outline-none"
-                      onClick={() => scriptsLoaded.postcode && scriptsLoaded.kakao && handleAddressSearch()}
+                      onClick={() => scriptsLoaded && handleAddressSearch()}
                     />
                   </div>
                   <button
                     type="button"
                     onClick={handleAddressSearch}
-                    disabled={!scriptsLoaded.postcode || !scriptsLoaded.kakao}
+                    disabled={!scriptsLoaded}
                     className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {(!scriptsLoaded.postcode || !scriptsLoaded.kakao) ? (
+                    {!scriptsLoaded ? (
                       <Loader2 size={18} className="animate-spin" />
                     ) : (
                       <Search size={18} />
