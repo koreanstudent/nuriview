@@ -38,6 +38,18 @@ export default function SubmitStorePage() {
     init()
   }, [router])
 
+  // 마운트 시 이미 로드된 스크립트 체크
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.daum?.Postcode) {
+        setScriptsLoaded(prev => ({ ...prev, postcode: true }))
+      }
+      if (window.kakao?.maps) {
+        setScriptsLoaded(prev => ({ ...prev, kakao: true }))
+      }
+    }
+  }, [])
+
   const isScriptsReady = scriptsLoaded.postcode && scriptsLoaded.kakao
 
   const handleAddressSearch = () => {
