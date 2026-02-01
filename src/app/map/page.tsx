@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { Store } from '@/types'
 import KakaoMap from '@/components/KakaoMap'
 import Link from 'next/link'
-import { Navigation, Loader2, ChevronUp, ChevronDown, MapPin, Star } from 'lucide-react'
+import { Navigation, Loader2, ChevronUp, ChevronDown, MapPin, List } from 'lucide-react'
 
 interface Bounds {
   sw: { lat: number; lng: number }
@@ -35,7 +35,7 @@ export default function MapPage() {
   const [center, setCenter] = useState({ lat: 37.5665, lng: 126.978 })
   const [locating, setLocating] = useState(false)
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null)
-  const [showNearbyList, setShowNearbyList] = useState(false)
+  const [showList, setShowList] = useState(true)
   const [mapReady, setMapReady] = useState(false)
 
   // 지도 준비 완료 후 내 위치 가져오기
@@ -97,7 +97,6 @@ export default function MapPage() {
         }
         setCenter(loc)
         setMyLocation(loc)
-        setShowNearbyList(true)
         setLocating(false)
       },
       (error) => {
@@ -109,16 +108,17 @@ export default function MapPage() {
     )
   }
 
-  // 가까운 가맹점 정렬 (최대 10개)
-  const nearbyStores = useMemo(() => {
-    if (!myLocation) return []
-    return stores
-      .map(store => ({
-        ...store,
-        distance: calculateDistance(myLocation.lat, myLocation.lng, store.lat, store.lng)
-      }))
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 10)
+  // 가맹점 정렬 (내 위치가 있으면 거리순, 없으면 이름순)
+  const sortedStores = useMemo(() => {
+    if (myLocation) {
+      return stores
+        .map(store => ({
+          ...store,
+          distance: calculateDistance(myLocation.lat, myLocation.lng, store.lat, store.lng)
+        }))
+        .sort((a, b) => a.distance - b.distance)
+    }
+    return stores.map(store => ({ ...store, distance: null as number | null }))
   }, [stores, myLocation])
 
   return (
@@ -151,7 +151,7 @@ export default function MapPage() {
       <button
         onClick={handleMyLocation}
         disabled={locating}
-        className={`absolute ${showNearbyList ? 'bottom-72' : 'bottom-6'} right-4 bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-all disabled:opacity-50`}
+        className={`absolute ${showList ? 'bottom-72' : 'bottom-20'} right-4 bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-all disabled:opacity-50`}
         title="내 위치로 이동"
       >
         {locating ? (
@@ -161,48 +161,52 @@ export default function MapPage() {
         )}
       </button>
 
-      {/* 내 주변 가맹점 목록 */}
-      {myLocation && (
-        <div className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-transform ${showNearbyList ? 'translate-y-0' : 'translate-y-[calc(100%-48px)]'}`}>
-          {/* 헤더 */}
-          <button
-            onClick={() => setShowNearbyList(!showNearbyList)}
-            className="w-full px-4 py-3 flex items-center justify-between border-b border-gray-100"
-          >
-            <div className="flex items-center gap-2">
-              <MapPin size={18} className="text-blue-600" />
-              <span className="font-medium text-gray-900">내 주변 가맹점</span>
-              <span className="text-sm text-gray-500">({nearbyStores.length})</span>
-            </div>
-            {showNearbyList ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
-          </button>
+      {/* 가맹점 목록 */}
+      <div className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transition-transform ${showList ? 'translate-y-0' : 'translate-y-[calc(100%-48px)]'}`}>
+        {/* 헤더 */}
+        <button
+          onClick={() => setShowList(!showList)}
+          className="w-full px-4 py-3 flex items-center justify-between border-b border-gray-100"
+        >
+          <div className="flex items-center gap-2">
+            <List size={18} className="text-blue-600" />
+            <span className="font-medium text-gray-900">
+              {myLocation ? '내 주변 가맹점' : '지도 내 가맹점'}
+            </span>
+            <span className="text-sm text-gray-500">({sortedStores.length})</span>
+          </div>
+          {showList ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+        </button>
 
-          {/* 목록 */}
-          {showNearbyList && (
-            <div className="max-h-56 overflow-y-auto">
-              {nearbyStores.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">주변에 가맹점이 없습니다.</p>
-              ) : (
-                nearbyStores.map((store) => (
-                  <Link
-                    key={store.id}
-                    href={`/stores/${store.id}`}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">{store.name}</p>
-                      <p className="text-sm text-gray-500 truncate">{store.road_address || store.address}</p>
-                    </div>
+        {/* 목록 */}
+        {showList && (
+          <div className="max-h-56 overflow-y-auto">
+            {sortedStores.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">
+                {loading ? '불러오는 중...' : '이 지역에 가맹점이 없습니다.'}
+              </p>
+            ) : (
+              sortedStores.map((store) => (
+                <Link
+                  key={store.id}
+                  href={`/stores/${store.id}`}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{store.name}</p>
+                    <p className="text-sm text-gray-500 truncate">{store.road_address || store.address}</p>
+                  </div>
+                  {store.distance !== null && (
                     <div className="ml-3 text-right">
                       <p className="text-sm font-medium text-blue-600">{formatDistance(store.distance)}</p>
                     </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-      )}
+                  )}
+                </Link>
+              ))
+            )}
+          </div>
+        )}
+      </div>
     </main>
   )
 }
