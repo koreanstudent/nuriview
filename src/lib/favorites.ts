@@ -24,9 +24,9 @@ export async function isFavorite(userId: string, storeId: number) {
     .select('id')
     .eq('user_id', userId)
     .eq('store_id', storeId)
-    .single()
+    .maybeSingle()
 
-  return { isFavorite: !error && !!data, error }
+  return { isFavorite: !!data, error }
 }
 
 export async function getFavoritesByUserId(userId: string) {
