@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "누리뷰 - 온누리상품권 가맹점 후기",
-  description: "온누리상품권 가맹점 실시간 후기 서비스",
+  description: "함께 만드는 온누리 가맹점 후기 & 제보",
 };
 
 export default function RootLayout({

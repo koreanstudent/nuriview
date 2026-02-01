@@ -85,7 +85,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">누리뷰</h1>
           <p className="text-lg text-gray-600 mb-8">
-            온누리상품권 가맹점 실시간 후기
+            함께 만드는 온누리 가맹점 후기 & 제보
           </p>
           <div className="flex justify-center gap-4">
             <Link

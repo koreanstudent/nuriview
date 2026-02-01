@@ -18,6 +18,7 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
   const [hoverRating, setHoverRating] = useState(0)
   const [content, setContent] = useState('')
   const [isAvailable, setIsAvailable] = useState(true)
+  const [voucherType, setVoucherType] = useState<'paper' | 'card' | 'mobile'>('paper')
   const [minAmount, setMinAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -87,6 +88,7 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
       content.trim(),
       rating,
       isAvailable,
+      voucherType,
       minAmount ? parseInt(minAmount) : null,
       imageUrl
     )
@@ -100,6 +102,7 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
     setContent('')
     setRating(5)
     setIsAvailable(true)
+    setVoucherType('paper')
     setMinAmount('')
     removeImage()
     setLoading(false)
@@ -200,6 +203,46 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
         )}
       </div>
 
+      {/* 상품권 종류 */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">사용한 상품권</label>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setVoucherType('paper')}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+              voucherType === 'paper'
+                ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            지류
+          </button>
+          <button
+            type="button"
+            onClick={() => setVoucherType('card')}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+              voucherType === 'card'
+                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            카드
+          </button>
+          <button
+            type="button"
+            onClick={() => setVoucherType('mobile')}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+              voucherType === 'mobile'
+                ? 'border-green-500 bg-green-50 text-green-700'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            모바일
+          </button>
+        </div>
+      </div>
+
       {/* 사용 가능 여부 & 최소 금액 */}
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2 cursor-pointer">
@@ -209,7 +252,7 @@ export default function ReviewForm({ storeId, user, onReviewAdded }: ReviewFormP
             onChange={(e) => setIsAvailable(e.target.checked)}
             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm text-gray-700">현재 사용 가능</span>
+          <span className="text-sm text-gray-700">사용 가능</span>
         </label>
 
         <div className="flex items-center gap-2">

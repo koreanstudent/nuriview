@@ -20,6 +20,7 @@ export interface Review {
   content: string
   rating: number
   is_available: boolean
+  voucher_type: 'paper' | 'card' | 'mobile' | null
   min_amount: number
   image_url: string | null
   created_at: string

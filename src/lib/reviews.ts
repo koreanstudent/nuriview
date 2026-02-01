@@ -6,6 +6,7 @@ export async function createReview(
   content: string,
   rating: number,
   isAvailable: boolean,
+  voucherType: 'paper' | 'card' | 'mobile',
   minAmount: number | null,
   imageUrl: string | null = null
 ) {
@@ -17,6 +18,7 @@ export async function createReview(
       content,
       rating,
       is_available: isAvailable,
+      voucher_type: voucherType,
       min_amount: minAmount || 0,
       image_url: imageUrl,
     })

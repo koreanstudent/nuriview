@@ -4,7 +4,7 @@ import { User } from '@supabase/supabase-js'
 import { Review } from '@/types'
 import { deleteReview } from '@/lib/reviews'
 import { likeReview, unlikeReview, getReviewLikes } from '@/lib/likes'
-import { Star, CheckCircle, XCircle, Trash2, ThumbsUp } from 'lucide-react'
+import { Star, CheckCircle, XCircle, Trash2, ThumbsUp, FileText, CreditCard, Smartphone } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 interface ReviewListProps {
@@ -170,6 +170,26 @@ export default function ReviewList({ reviews, user, onReviewDeleted }: ReviewLis
 
                 {/* 뱃지 */}
                 <div className="flex flex-wrap gap-2 mt-2">
+                  {/* 상품권 종류 */}
+                  {review.voucher_type === 'paper' && (
+                    <span className="flex items-center gap-1 text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
+                      <FileText size={12} />
+                      지류
+                    </span>
+                  )}
+                  {review.voucher_type === 'card' && (
+                    <span className="flex items-center gap-1 text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                      <CreditCard size={12} />
+                      카드
+                    </span>
+                  )}
+                  {review.voucher_type === 'mobile' && (
+                    <span className="flex items-center gap-1 text-xs text-green-700 bg-green-50 px-2 py-1 rounded">
+                      <Smartphone size={12} />
+                      모바일
+                    </span>
+                  )}
+                  {/* 사용 가능 여부 */}
                   {review.is_available ? (
                     <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
                       <CheckCircle size={12} />
