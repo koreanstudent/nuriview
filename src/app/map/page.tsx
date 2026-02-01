@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Store } from '@/types'
 import KakaoMap from '@/components/KakaoMap'
@@ -36,6 +36,29 @@ export default function MapPage() {
   const [locating, setLocating] = useState(false)
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [showNearbyList, setShowNearbyList] = useState(false)
+
+  // 페이지 로드 시 자동으로 내 위치 가져오기
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setLocating(true)
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }
+          setCenter(loc)
+          setMyLocation(loc)
+          setLocating(false)
+        },
+        () => {
+          // 위치 권한 거부 시 기본 위치(서울) 유지
+          setLocating(false)
+        },
+        { enableHighAccuracy: true }
+      )
+    }
+  }, [])
 
   const fetchStoresInBounds = useCallback(async (bounds: Bounds) => {
     setLoading(true)

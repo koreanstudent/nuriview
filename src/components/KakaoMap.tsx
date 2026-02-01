@@ -39,7 +39,7 @@ export default function KakaoMap({
 
   // 이미 로드된 스크립트 확인
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.kakao && window.kakao.maps) {
+    if (typeof window !== 'undefined' && window.kakao && window.kakao.maps && window.kakao.maps.MarkerClusterer) {
       setScriptLoaded(true)
     }
   }, [])
@@ -95,8 +95,8 @@ export default function KakaoMap({
       }
     }
 
-    // kakao.maps.load가 이미 완료됐는지 확인
-    if (window.kakao.maps.Map) {
+    // kakao.maps.load가 이미 완료됐는지 확인 (클러스터러 포함)
+    if (window.kakao.maps.Map && window.kakao.maps.MarkerClusterer) {
       initMap()
     } else {
       window.kakao.maps.load(initMap)
@@ -217,17 +217,11 @@ export default function KakaoMap({
         src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=clusterer`}
         strategy="afterInteractive"
         onLoad={() => {
-          console.log('Kakao script loaded')
-          const checkKakao = () => {
-            if (window.kakao && window.kakao.maps) {
-              console.log('Kakao maps ready')
+          if (window.kakao && window.kakao.maps) {
+            window.kakao.maps.load(() => {
               setScriptLoaded(true)
-            } else {
-              console.log('Waiting for kakao...')
-              setTimeout(checkKakao, 100)
-            }
+            })
           }
-          checkKakao()
         }}
         onError={(e) => {
           console.error('Kakao script error:', e)
