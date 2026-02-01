@@ -9,34 +9,6 @@ import { getCurrentUser } from '@/lib/auth'
 import { User } from '@supabase/supabase-js'
 import { Store, MapPin, Loader2, CheckCircle, ArrowLeft, Search } from 'lucide-react'
 
-declare global {
-  interface Window {
-    daum: {
-      Postcode: new (options: {
-        oncomplete: (data: {
-          address: string
-          roadAddress: string
-          jibunAddress: string
-        }) => void
-      }) => { open: () => void }
-    }
-    kakao: {
-      maps: {
-        load: (callback: () => void) => void
-        services: {
-          Geocoder: new () => {
-            addressSearch: (
-              address: string,
-              callback: (result: Array<{ x: string; y: string }>, status: string) => void
-            ) => void
-          }
-          Status: { OK: string }
-        }
-      }
-    }
-  }
-}
-
 export default function SubmitStorePage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)

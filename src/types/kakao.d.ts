@@ -1,3 +1,16 @@
+declare namespace daum {
+  class Postcode {
+    constructor(options: {
+      oncomplete: (data: {
+        address: string
+        roadAddress: string
+        jibunAddress: string
+      }) => void
+    })
+    open(): void
+  }
+}
+
 declare namespace kakao.maps {
   class Map {
     constructor(container: HTMLElement, options: MapOptions)
@@ -81,9 +94,24 @@ declare namespace kakao.maps {
     function addListener(target: any, type: string, callback: () => void): void
   }
 
+  namespace services {
+    class Geocoder {
+      addressSearch(
+        address: string,
+        callback: (result: Array<{ x: string; y: string }>, status: string) => void
+      ): void
+    }
+    const Status: {
+      OK: string
+      ZERO_RESULT: string
+      ERROR: string
+    }
+  }
+
   function load(callback: () => void): void
 }
 
 interface Window {
   kakao: typeof kakao
+  daum: typeof daum
 }
