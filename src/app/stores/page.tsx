@@ -17,6 +17,7 @@ const PER_PAGE = 20
 interface StoreWithReviews extends Store {
   reviewCount?: number
   avgRating?: number
+  availablePercent?: number
 }
 
 function StoresList() {
@@ -86,27 +87,32 @@ function StoresList() {
         const storeIds = data.map(s => s.id)
         const { data: reviewStats } = await supabase
           .from('reviews')
-          .select('store_id, rating')
+          .select('store_id, rating, is_available')
           .in('store_id', storeIds)
 
-        const statsMap = new Map<number, { count: number; total: number }>()
+        const statsMap = new Map<number, { count: number; total: number; available: number }>()
         if (reviewStats) {
           reviewStats.forEach(r => {
-            const existing = statsMap.get(r.store_id) || { count: 0, total: 0 }
+            const existing = statsMap.get(r.store_id) || { count: 0, total: 0, available: 0 }
             statsMap.set(r.store_id, {
               count: existing.count + 1,
-              total: existing.total + r.rating
+              total: existing.total + r.rating,
+              available: existing.available + (r.is_available ? 1 : 0)
             })
           })
         }
 
-        let storesWithReviews: StoreWithReviews[] = data.map(store => ({
-          ...store,
-          reviewCount: statsMap.get(store.id)?.count || 0,
-          avgRating: statsMap.has(store.id)
-            ? statsMap.get(store.id)!.total / statsMap.get(store.id)!.count
-            : 0
-        }))
+        let storesWithReviews: StoreWithReviews[] = data.map(store => {
+          const stats = statsMap.get(store.id)
+          return {
+            ...store,
+            reviewCount: stats?.count || 0,
+            avgRating: stats ? stats.total / stats.count : 0,
+            availablePercent: stats && stats.count > 0
+              ? Math.round((stats.available / stats.count) * 100)
+              : undefined
+          }
+        })
 
         if (sort === 'reviews') {
           storesWithReviews = storesWithReviews.sort((a, b) =>
@@ -225,6 +231,7 @@ function StoresList() {
               store={store}
               reviewCount={store.reviewCount}
               averageRating={store.avgRating}
+              availablePercent={store.availablePercent}
             />
           ))}
         </div>

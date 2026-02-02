@@ -2,15 +2,16 @@
 
 import Link from 'next/link'
 import { Store } from '@/types'
-import { CreditCard, Smartphone, FileText, Star, MessageSquare, AlertTriangle } from 'lucide-react'
+import { CreditCard, Smartphone, FileText, Star, MessageSquare, AlertTriangle, CheckCircle } from 'lucide-react'
 
 interface StoreCardProps {
   store: Store
   averageRating?: number
   reviewCount?: number
+  availablePercent?: number
 }
 
-export default function StoreCard({ store, averageRating, reviewCount }: StoreCardProps) {
+export default function StoreCard({ store, averageRating, reviewCount, availablePercent }: StoreCardProps) {
   return (
     <Link href={`/stores/${store.id}`}>
       <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all cursor-pointer">
@@ -52,6 +53,12 @@ export default function StoreCard({ store, averageRating, reviewCount }: StoreCa
               <div className="flex items-center gap-1 text-gray-500">
                 <MessageSquare size={12} />
                 <span className="text-xs">후기 {reviewCount}</span>
+              </div>
+            )}
+            {availablePercent !== undefined && (
+              <div className={`flex items-center gap-1 ${availablePercent >= 70 ? 'text-green-600' : availablePercent >= 40 ? 'text-yellow-600' : 'text-red-500'}`}>
+                <CheckCircle size={12} />
+                <span className="text-xs">{availablePercent}%</span>
               </div>
             )}
           </div>
